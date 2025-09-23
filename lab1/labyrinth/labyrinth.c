@@ -28,7 +28,7 @@ bool isValidPlayer(char playerId) {
 bool loadMap(Labyrinth *labyrinth, const char *filename) {
     // TODO: Implement this function
     // 注意这里的打开文件的方式，关于文件需要复习
-    FILE *fp = fopen(filename, 'r');
+    FILE *fp = fopen(filename, "r");
     if (!fp) {
         return false;
     }
@@ -72,18 +72,59 @@ Position findPlayer(Labyrinth *labyrinth, char playerId) {
 
 Position findFirstEmptySpace(Labyrinth *labyrinth) {
     // TODO: Implement this function
+    // 这个函数用来找到第一个空闲的地方，返回二维坐标
     Position pos = {-1, -1};
+    for (int i = 0; i < labyrinth -> rows; i++) {
+        for (int j = 0; j < labyrinth -> cols; j++) {
+            if (labyrinth -> map[i][j] == '.') {
+                pos.row = i;
+                pos.col = j;
+                return pos;
+            }
+        }
+    }
     return pos;
 }
 
 bool isEmptySpace(Labyrinth *labyrinth, int row, int col) {
     // TODO: Implement this function
-    return false;
+    // 这个函数用来判断一个地方是否是空的，返回真或假
+    return (labyrinth -> map[row][col] == '.');
 }
 
 bool movePlayer(Labyrinth *labyrinth, char playerId, const char *direction) {
     // TODO: Implement this function
-    return false;
+    Position cur_pos = findPlayer(labyrinth, playerId);
+    int new_row = cur_pos.row;
+    int new_col = cur_pos.col;
+
+    // 主要的逻辑
+    if (strcmp(direction, "left") == 0) {
+        new_col -= 1;
+    } else if (strcmp(direction, "right") == 0) {
+        new_col += 1;
+    } else if (strcmp(direction, "up") == 0) {
+        new_row -= 1;
+    } else if (strcmp(direction, "down") == 0) {
+        new_row += 1;
+    } else {
+        return false;
+    }
+    
+    // 进行越界检查
+    if (new_row < 0 || new_row >= labyrinth -> rows || new_col < 0 || new_col >= labyrinth -> cols) {
+        return false;
+    }
+
+    // 看能不能走过去
+    if (!isEmptySpace(labyrinth, new_row, new_col)) {
+        return false;
+    }
+
+    // 最后进行移动
+    labyrinth -> map[cur_pos.row][cur_pos.col] = '.';
+    labyrinth -> map[new_row][new_col] = playerId;
+    return true;
 }
 
 bool saveMap(Labyrinth *labyrinth, const char *filename) {
