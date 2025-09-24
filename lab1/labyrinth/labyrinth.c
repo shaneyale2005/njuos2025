@@ -129,12 +129,34 @@ bool movePlayer(Labyrinth *labyrinth, char playerId, const char *direction) {
 
 bool saveMap(Labyrinth *labyrinth, const char *filename) {
     // TODO: Implement this function
-    return false;
+    // 本函数用来保存一个地图，和loadMap的功能恰好相反
+    // 注意复习C语言中文件的写入方式
+    FILE *fp = fopen(filename, 'w');
+    if (!fp) {
+        return false; // 打开文件失败
+    }
+    // 这里逐行写入迷宫
+    for (int i = 0; i < labyrinth -> rows; i++) {
+        fprintf(fp, "%s\n", labyrinth -> map[i]);
+    }
+
+    fclose(fp);
+    return true;
 }
 
 // Check if all empty spaces are connected using DFS
 void dfs(Labyrinth *labyrinth, int row, int col, bool visited[MAX_ROWS][MAX_COLS]) {
     // TODO: Implement this function
+    // 首先应该是边界条件的检查
+    if (row < 0 || row >= MAX_ROWS || col < 0 || col >= MAX_COLS || labyrinth -> map[row][col] != '.' || visited[row][col]) {
+        return;
+    }
+    visited[row][col] = true;
+    dfs(labyrinth, row - 1, col, visited);
+    dfs(labyrinth, row + 1, col, visited);
+    dfs(labyrinth, row, col - 1, visited);
+    dfs(labyrinth, row, col + 1, visited);
+
 }
 
 bool isConnected(Labyrinth *labyrinth) {
