@@ -1,6 +1,7 @@
 #define MAX_ROWS 100
 #define MAX_COLS 100
 #define VERSION_INFO "Labyrinth Game"
+#include <stdbool.h>
 
 typedef struct {
     char map[MAX_ROWS][MAX_COLS];
