@@ -8,7 +8,86 @@
 
 int main(int argc, char *argv[]) {
     // TODO: Implement this function
-    return 0;
+    char *mapFile = NULL;
+    char playerID = '\0';
+    char *direction = NULL;
+    bool versionFlag = false;
+
+    // 首先需要参数解析
+    for (int i = 1; i < argc; i++) {
+        if (strcmp(argv[i], "-m") == 0 || strcmp(argv[i], "--map") == 0) {
+            if (i + 1 < argc) mapFile = argv[++i];
+            else { printUsage(); return EXIT_FAILURE; }
+        } else if (strcmp(argv[i], "-p") == 0 || strcmp(argv[i], "--played") == 0) {
+            if (i + 1 < argc) playerID = argv[i + 1][0];
+            else { printUsage(); return EXIT_FAILURE; }
+        } else if (strcmp(argv[i], "--move") == 0) {
+            if (i + 1 < argc) direction = argv[++i];
+            else { printUsage(); return EXIT_FAILURE; }
+        } else if (strcmp(argv[i], "--version") == 0) {
+            versionFlag = true;
+        } else {
+            printUsage();
+            return EXIT_FAILURE;
+        }
+    }
+
+    // 针对--version，我们进行单独的判断
+    if (versionFlag) {
+        if (argc != 2) return EXIT_FAILURE;
+        printf("Labyrinth Game v1.0\n");
+        return EXIT_SUCCESS;
+    }
+
+    // 接下来是一个必要的参数检查
+    if (!mapFile || !isValidPlayer(playerID)) {
+        printUsage();
+        return EXIT_FAILURE;
+    }
+
+    // 加载地图
+    Labyrinth lab;
+    if (!loadMap(&lab, mapFile)) {
+        fprintf(stderr, "Error: failed to load map\n");
+        return EXIT_FAILURE;
+    }
+
+    // 针对地图的合法性进行检查
+    if (lab.cols > MAX_ROWS || lab.cols > MAX_COLS || lab.rows <=0 || lab.cols <= 0 || !isConnected(&lab)) {
+        fprintf(stderr, "Error: invalid map\n");
+        return EXIT_FAILURE;
+    }
+
+
+    // 进行玩家的查找
+    Position pos = findPlayer(&lab, playerID);
+    if (pos.row == -1) {
+        pos = findFirstEmptySpace(&lab);
+        if (pos.row == -1) {
+            fprintf(stderr, "Error: no empty space for player\n");
+            return EXIT_FAILURE;
+        }
+        lab.map[pos.row][pos.col] = playerID;
+    }
+
+    // 处理移动
+    if (direction) {
+        if (!movePlayer(&lab, playerID, direction)) {
+            fprintf(stderr, "Error: can not move\n");
+            return EXIT_FAILURE;
+        }
+    }
+
+    // 保存地图
+    if (!saveMap(&lab, mapFile)) {
+        fprintf(stderr, "Error: failed to save map\n");
+        return EXIT_FAILURE;
+    }
+
+    for (int i = 0; i < lab.rows; i++) {
+        printf("%s\n", lab.map[i]);
+    }
+    return EXIT_SUCCESS;
 }
 
 void printUsage() {
@@ -131,7 +210,7 @@ bool saveMap(Labyrinth *labyrinth, const char *filename) {
     // TODO: Implement this function
     // 本函数用来保存一个地图，和loadMap的功能恰好相反
     // 注意复习C语言中文件的写入方式
-    FILE *fp = fopen(filename, 'w');
+    FILE *fp = fopen(filename, "w");
     if (!fp) {
         return false; // 打开文件失败
     }
@@ -148,7 +227,7 @@ bool saveMap(Labyrinth *labyrinth, const char *filename) {
 void dfs(Labyrinth *labyrinth, int row, int col, bool visited[MAX_ROWS][MAX_COLS]) {
     // TODO: Implement this function
     // 首先应该是边界条件的检查，建议复习dfs的模版函数
-    if (row < 0 || row >= MAX_ROWS || col < 0 || col >= MAX_COLS || labyrinth -> map[row][col] != '.' || visited[row][col]) {
+    if (row < 0 || row >= labyrinth -> rows || col < 0 || col >= labyrinth -> cols|| labyrinth -> map[row][col] != '.' || visited[row][col]) {
         return;
     }
     visited[row][col] = true;
@@ -169,8 +248,8 @@ bool isConnected(Labyrinth *labyrinth) {
     }
     dfs(labyrinth, firstEmpty.row, firstEmpty.col, visited);
     // 如果存在dfs没有搜索到的空地，就认为不是连通的
-    for (int i = 0; i < MAX_ROWS; i++) {
-        for (int j = 0; j < MAX_COLS; j++) {
+    for (int i = 0; i < labyrinth -> rows; i++) {
+        for (int j = 0; j < labyrinth -> cols; j++) {
             if (labyrinth -> map[i][j] == '.' && !visited[i][j]) {
                 return false;
             }

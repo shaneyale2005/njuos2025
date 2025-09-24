@@ -1,5 +1,7 @@
 {
     "files.associations": {
-        "labyrinth.h": "c"
+        "labyrinth.h": "c",
+        "testkit.h": "c",
+        "assert.h": "c"
     }
 }
