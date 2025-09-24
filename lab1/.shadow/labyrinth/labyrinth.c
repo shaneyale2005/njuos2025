@@ -17,8 +17,8 @@ int main(int argc, char *argv[]) {
         if (strcmp(argv[i], "-m") == 0 || strcmp(argv[i], "--map") == 0) {
             if (i + 1 < argc) mapFile = argv[++i];
             else { printUsage(); return EXIT_FAILURE; }
-        } else if (strcmp(argv[i], "-p") == 0 || strcmp(argv[i], "--played") == 0) {
-            if (i + 1 < argc) playerID = argv[i + 1][0];
+        } else if (strcmp(argv[i], "-p") == 0 || strcmp(argv[i], "--player") == 0) {
+            if (i + 1 < argc) playerID = argv[++i][0];
             else { printUsage(); return EXIT_FAILURE; }
         } else if (strcmp(argv[i], "--move") == 0) {
             if (i + 1 < argc) direction = argv[++i];
@@ -52,7 +52,7 @@ int main(int argc, char *argv[]) {
     }
 
     // 针对地图的合法性进行检查
-    if (lab.cols > MAX_ROWS || lab.cols > MAX_COLS || lab.rows <=0 || lab.cols <= 0 || !isConnected(&lab)) {
+    if (lab.rows > MAX_ROWS || lab.cols > MAX_COLS || lab.rows <=0 || lab.cols <= 0 || !isConnected(&lab)) {
         fprintf(stderr, "Error: invalid map\n");
         return EXIT_FAILURE;
     }
