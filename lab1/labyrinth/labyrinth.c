@@ -147,7 +147,7 @@ bool saveMap(Labyrinth *labyrinth, const char *filename) {
 // Check if all empty spaces are connected using DFS
 void dfs(Labyrinth *labyrinth, int row, int col, bool visited[MAX_ROWS][MAX_COLS]) {
     // TODO: Implement this function
-    // 首先应该是边界条件的检查
+    // 首先应该是边界条件的检查，建议复习dfs的模版函数
     if (row < 0 || row >= MAX_ROWS || col < 0 || col >= MAX_COLS || labyrinth -> map[row][col] != '.' || visited[row][col]) {
         return;
     }
@@ -156,10 +156,25 @@ void dfs(Labyrinth *labyrinth, int row, int col, bool visited[MAX_ROWS][MAX_COLS
     dfs(labyrinth, row + 1, col, visited);
     dfs(labyrinth, row, col - 1, visited);
     dfs(labyrinth, row, col + 1, visited);
-
 }
 
 bool isConnected(Labyrinth *labyrinth) {
     // TODO: Implement this function
-    return false;
+    // 这个函数是用来检查整体的连通性的
+    bool visited[MAX_ROWS][MAX_COLS] = {false};
+
+    Position firstEmpty = findFirstEmptySpace(labyrinth);
+    if (firstEmpty.row == -1 && firstEmpty.col == -1) {
+        return true;
+    }
+    dfs(labyrinth, firstEmpty.row, firstEmpty.col, visited);
+    // 如果存在dfs没有搜索到的空地，就认为不是连通的
+    for (int i = 0; i < MAX_ROWS; i++) {
+        for (int j = 0; j < MAX_COLS; j++) {
+            if (labyrinth -> map[i][j] == '.' && !visited[i][j]) {
+                return false;
+            }
+        }
+    }
+    return true;
 }
