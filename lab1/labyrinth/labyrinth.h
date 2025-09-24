@@ -1,6 +1,7 @@
 #define MAX_ROWS 100
 #define MAX_COLS 100
 #define VERSION_INFO "Labyrinth Game"
+#include <stdbool.h>
 
 typedef struct {
     char map[MAX_ROWS][MAX_COLS];
@@ -22,3 +23,4 @@ bool isEmptySpace(Labyrinth *labyrinth, int row, int col);
 bool movePlayer(Labyrinth *labyrinth, char playerId, const char *direction);
 bool saveMap(Labyrinth *labyrinth, const char *filename);
 bool isConnected(Labyrinth *labyrinth);
+void printUsage(void);

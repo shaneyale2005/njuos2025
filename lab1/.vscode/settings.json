@@ -2,6 +2,7 @@
     "files.associations": {
         "labyrinth.h": "c",
         "testkit.h": "c",
-        "assert.h": "c"
+        "assert.h": "c",
+        "stdbool.h": "c"
     }
 }
