@@ -10,9 +10,37 @@ char ch2 = '\0';
 char ch3[] = "I love you";
 ```
 
-同时应该熟悉相关的API操作。
+同时应该熟悉下列常用的字符串相关的API操作。
 
-- `strcpy(dest, src)`
-- `strcat(dest, src)`
-- `strcmp(ch1, ch2)`
-- `strlen(ch)`
+- `strcpy(dest, src)`：将src拷贝到dest
+- `strcat(dest, src)`：将src拼接到dest的末尾
+- `strcmp(ch1, ch2)`：比较ch1和ch2，如果两个相等就返回0
+- `strlen(ch)`：获得一个字符串的长度，不包含`\0`
+- `strstr(s, sub)`：查找子串sub在s中第一次出现的位置
+- `strchr(s, ch)`：查找字符ch在s中第一次出现的位置
+
+## 文件操作
+
+在C语言中，文件是通过`FILE *`来进行操作的。
+
+### 文件的打开与关闭
+
+使用`fopen(filename, mode)`对文件进行打开。
+
+常用的几种模式：
+- r：只读模式
+- w：写入，覆盖原文件，默认如果原文件不存在就创建
+- a：追加写入，写在文件的末尾
+- r+：读写，文件必须存在
+- w+：读写，清空原内容
+- a+：读写，以追加方式进行读写
+
+使用`fclose(FILE *fp)`对文件进行关闭。
+
+### 文件的读
+
+### 文件的写
+
+
+## 深度优先搜索
+
