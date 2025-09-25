@@ -10,8 +10,7 @@ char ch2 = '\0';
 char ch3[] = "I love you";
 ```
 
-同时应该熟悉下列常用的字符串相关的API操作。
-
+同时应该熟悉下列常用的字符串相关的操作：
 - `strcpy(dest, src)`：将src拷贝到dest
 - `strcat(dest, src)`：将src拼接到dest的末尾
 - `strcmp(ch1, ch2)`：比较ch1和ch2，如果两个相等就返回0
@@ -39,8 +38,15 @@ char ch3[] = "I love you";
 
 ### 文件的读
 
+- `fgets(buffer, size, fp)`：从文件中读一行，写入到buffer中，包括换行符，如果到达了文件的末尾就返回NULL
+- `fgetc(fp)`：读取单个字符
+- `fread(ptr, size, count, fp)`：按照二进制块来进行读取，用于非文本文件
+
 ### 文件的写
 
+- `fprintf(fp, "%s\n", str)`：类似于printf，但是是写入到文件中
+- `fputc()`：写入一个字符
+- `fwrite(ptr, size, count, fp)`：逐块写，写入到一个二进制块中
 
 ## 深度优先搜索
 
