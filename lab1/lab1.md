@@ -50,3 +50,29 @@ char ch3[] = "I love you";
 
 ## 深度优先搜索
 
+熟悉DFS的模版，这里使用Cpp中的模版来对DFS进行高度的抽象。
+
+```cpp
+// 这里使用Cpp的模版
+template <typename Node>
+void dfs(
+    const Node& start,
+    std::unordered_set<Node>& visited,
+    const std::function<std::vector<Node>(const Node&)>& getNeighbors,
+    const std::function<void(const Node&)>& visit = nullptr  
+)
+{
+    // 1.访问的直接返回，这里主要是为了防止重复访问，针对的是一个有环的图
+    if (visited.find(start) != visited.end()) return;
+    // 2. 标记已经访问的
+    visited.insert(start);
+    // 3. 访问回调
+    if (visit) visit(start);
+    // 4. 取相邻的节点
+    auto neigh = getNeighbors(start);
+    // 5. 进行递归遍历，如果是空的循环利用语言特性就可以直接返回，不用单独写语句了
+    for (const auto& n : neigh) {
+        dfs(n, visited, getNeighbors, visit);
+    }
+}
+```
