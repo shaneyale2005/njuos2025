@@ -27,6 +27,9 @@ typedef struct Process
 Process *processes[MAX_PROCESSES];
 Process *all_processes[MAX_PROCESSES];
 int proc_count = 0;
+// 这里的两个变量用来控制打印的行为
+bool show_pids = false;
+bool numeric_sort = false;
 
 // 读取/proc目录获得pid，ppid，name这三个信息，这很重要的
 Process *read_process(int pid) {
@@ -62,12 +65,30 @@ void scan_processes(){
     closedir(dir);
 }
 
+// 递归打印树的辅助函数
+int cmp_pid(const Process **a, const Process **b) {
+    return (*a)->pid - (*b)->pid;
+}
+
+
 // 递归打印树
 void print_tree(Process *p, int level) {
     for (int i = 0; i < level; i++) {
         printf(" ");
     }
-    printf("%s\n", p->name);
+    if (show_pids) {
+        printf("%s(%d)\n", p->name, p->pid);
+    } else {
+        printf("%s\n", p->name);
+    }
+
+    // 这里在打印子进程之前，必要的时候应该排序
+    if (numeric_sort && p->child_count > 1) {
+        // 这里的打印排序逻辑值得好好琢磨下
+        qsort(p->children, p->child_count, sizeof(Process*), (int(*)(const void*, const void*))cmp_pid);
+    }
+
+    // printf("%s\n", p->name);
     for (int i = 0; i < p->child_count; i++) {
         print_tree(p->children[i], level + 1);
     }
@@ -77,15 +98,29 @@ void print_tree(Process *p, int level) {
 void build_tree() {
     for (int i = 0; i < proc_count; i++) {
         Process *p = all_processes[i];
-        if (p->ppid > 0 && all_processes[p->ppid]) {
+        if (p->ppid > 0 && processes[p->ppid]) {
             Process *parent = processes[p->ppid];
             parent->children[parent->child_count++] = p;
         }
-
     }
 }
 
-int main() {
+int main(int argc, char *argv[]) {
+    // 这里应该添加对命令行参数的解析部分
+    for (int i = 1; i < argc; i++) {
+        if (strcmp("-V", argv[1]) == 0 || strcmp("--version", argv[1]) == 0) {
+            printf("This is my pstree\n");
+            return 0;
+        } else if (strcmp("-p", argv[i]) == 0 || strcmp("--show-pids", argv[i]) == 0) {
+            show_pids = true;
+        } else if (strcmp("-n", argv[i]) == 0 || strcmp("--numeric-sort", argv[i]) == 0) {
+            numeric_sort = true;
+        } else {
+            fprintf(stderr, "Invalid Option%s\n", argv[1]);
+            return 1;
+        }
+    }
+    
     scan_processes();
     build_tree();
 
