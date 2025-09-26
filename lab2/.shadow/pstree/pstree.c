@@ -85,7 +85,17 @@ void build_tree() {
     }
 }
 
-int main() {
+int main(int argc, char *argv[]) {
+    // 这里应该添加对命令行参数的解析部分
+    if (argc > 1) {
+        if (strcmp("-v", argv[1]) == 0 || strcmp("--version", argv[1]) == 0) {
+            printf("This is my pstree\n");
+        } else {
+            fprintf(stderr, "Invalid Option%s\n", argv[1]);
+            return 1;
+        }
+    }
+    
     scan_processes();
     build_tree();
 
