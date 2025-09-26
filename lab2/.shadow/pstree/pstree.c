@@ -108,7 +108,7 @@ void build_tree() {
 int main(int argc, char *argv[]) {
     // 这里应该添加对命令行参数的解析部分
     for (int i = 1; i < argc; i++) {
-        if (strcmp("-v", argv[1]) == 0 || strcmp("--version", argv[1]) == 0) {
+        if (strcmp("-V", argv[1]) == 0 || strcmp("--version", argv[1]) == 0) {
             printf("This is my pstree\n");
             return 0;
         } else if (strcmp("-p", argv[i]) == 0 || strcmp("--show-pids", argv[i]) == 0) {
