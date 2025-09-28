@@ -12,15 +12,32 @@
 
 `/proc/PID/stat`是Linux内核维护的进程状态文件，包含了一个进程几乎所有的关键信息，它是一个单行、固定格式、高效可解析的二进制文本混合文件。
 
+## 目录操作
+
+使用C语言提供的库`dirent.h`来对目录进行操作，它是一个POSIX标准库头文件，名字来源于directory entry,在代码中使用`#include <dirent.h>`进行操作。
+
+了解`dirent`这个结构体的内部细节。
+
 ```c
 struct dirent {
-    ino_t          d_ino;       // inode 节点号
-    off_t          d_off;       // 偏移量（不常用）
+    ino_t          d_ino;       // 节点号
+    off_t          d_off;       // 偏移量，但是不常用，可以忽略
     unsigned short d_reclen;    // 目录项长度
     unsigned char  d_type;      // 文件类型
     char           d_name[256]; // 文件名（以 '\0' 结尾的字符串）
 };
 ```
+
+核心操作API如下。
+
+- `DIR *opendir(const chat *name)`：打开目录
+- `struct dirent *readdir(DIR *dirp)`：读取目录中的下一个目录项，到NULL结束
+- `int closedir(DIR *dirp)`：关闭目录
+
+
+
+
+
 
 
 
