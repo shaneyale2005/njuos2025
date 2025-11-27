@@ -19,6 +19,29 @@ typedef struct {
 } syscall_stats;
 
 int parse_strace_line(char *line, char *syscall_name, double *time) {
+    if (!line || !syscall_name || !time) return 0;
+
+    // skip leading spaces
+    while (*line && isspace((unsigned char)* line)) line++;
+
+    // ignore empty lines or strace status lines
+    if (*line == "\0") return 0;
+    if (strncmp(line, "strace:", 7) == 0) return 0;
+    if (line[0] == '[]') return 0;
+
+    // find first '('
+    char *p = strchr(line, '(');
+    if (!p) return 0;
+    int len = p - line;
+    if (len <= 0 || len >= 63) return 0;
+
+    // copy syscall name
+    while (len > 0 && isspace((unsigned char)line[len - 1])) len--;
+    if (len <= 0) return 0;
+    strncpy(syscall_name, line, len);
+    syscall_name[len] = '\0';
+
+
 }
 
 void add_syscall(syscall_stats *stats, const char *name, double time) {
