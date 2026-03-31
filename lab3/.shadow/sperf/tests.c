@@ -2,24 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "testkit.h"
-
-#define MAX_SYSCALLS 1024
-#define MAX_NAME_LEN 64
-
-typedef struct {
-    char name[MAX_NAME_LEN];
-    double time;
-} syscall_stat;
-
-typedef struct {
-    syscall_stat stats[MAX_SYSCALLS];
-    int count;
-    double total_time;
-} syscall_stats;
-
-int parse_strace_line(char *line, char *syscall_name, double *time);
-void add_syscall(syscall_stats *stats, const char *name, double time);
-void print_top_syscalls(syscall_stats *stats, int n);
+#include "sperf_core.h"
 
 static void assert_double_eq(double actual, double expected, double eps, const char *msg) {
     tk_assert(fabs(actual - expected) <= eps, "%s: got %.9f expected %.9f", msg, actual, expected);
@@ -151,6 +134,40 @@ UnitTest(ignore_too_long_name) {
     char name[MAX_NAME_LEN];
     double time = 0.0;
     tk_assert(parse_strace_line(line, name, &time) == 0, "too long syscall name should be ignored");
+}
+
+UnitTest(parse_dtruss_standard_line) {
+    char line[] = "    245 mmap(0x10000B000, 0x2000, 0x5, 0x12, 0x3, 0x7FFF00000001)\t\t = 0xB000 0";
+    char name[MAX_NAME_LEN];
+    double time = 0.0;
+
+    tk_assert(parse_dtruss_line(line, name, &time) == 1, "dtruss line should parse");
+    tk_assert(strcmp(name, "mmap") == 0, "dtruss syscall name should be mmap");
+    assert_double_eq(time, 245.0 / 1000000.0, 1e-9, "dtruss elapsed time");
+}
+
+UnitTest(parse_dtruss_ignores_header) {
+    char line[] = " ELAPSD SYSCALL(args) \t\t = return";
+    char name[MAX_NAME_LEN];
+    double time = 0.0;
+
+    tk_assert(parse_dtruss_line(line, name, &time) == 0, "dtruss header should be ignored");
+}
+
+UnitTest(parse_dtruss_ignores_error_line) {
+    char line[] = "dtrace: system integrity protection is on, some features will not be available";
+    char name[MAX_NAME_LEN];
+    double time = 0.0;
+
+    tk_assert(parse_dtruss_line(line, name, &time) == 0, "dtrace error line should be ignored");
+}
+
+UnitTest(parse_dtruss_requires_elapsed_prefix) {
+    char line[] = "mmap(0x10000B000, 0x2000, 0x5, 0x12, 0x3, 0x7FFF00000001)\t\t = 0xB000 0";
+    char name[MAX_NAME_LEN];
+    double time = 0.0;
+
+    tk_assert(parse_dtruss_line(line, name, &time) == 0, "dtruss line without elapsed prefix should be ignored");
 }
 
 UnitTest(add_first_syscall) {
