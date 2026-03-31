@@ -1,8 +1,28 @@
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/types.h>
+
 #include "testkit.h"
-#include "sperf_core.h"
+
+#define MAX_SYSCALLS 1024
+#define MAX_NAME_LEN 64
+
+typedef struct {
+    char name[MAX_NAME_LEN];
+    double time;
+} syscall_stat;
+
+typedef struct {
+    syscall_stat stats[MAX_SYSCALLS];
+    int count;
+    double total_time;
+} syscall_stats;
+
+char *sperf_find_executable(const char *command);
+void add_syscall(syscall_stats *stats, const char *name, double time);
+void print_top_syscalls(syscall_stats *stats, int n);
+int parse_strace_line(char *line, char *syscall_name, double *time);
 
 static void assert_double_eq(double actual, double expected, double eps, const char *msg) {
     tk_assert(fabs(actual - expected) <= eps, "%s: got %.9f expected %.9f", msg, actual, expected);
