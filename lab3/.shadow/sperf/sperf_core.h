@@ -33,9 +33,7 @@ void print_top_syscalls(syscall_stats *stats, int n);
 int run_trace_session(trace_session *session);
 
 int parse_strace_line(char *line, char *syscall_name, double *time);
-int parse_dtruss_line(char *line, char *syscall_name, double *time);
 
 int spawn_linux_session(trace_session *session, int argc, char *argv[]);
-int spawn_macos_session(trace_session *session, int argc, char *argv[]);
 
 #endif

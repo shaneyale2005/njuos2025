@@ -3,20 +3,6 @@
 
 #include "sperf_core.h"
 
-static int spawn_current_platform(trace_session *session, int argc, char *argv[]) {
-#ifdef __APPLE__
-    return spawn_macos_session(session, argc, argv);
-#elif defined(__linux__)
-    return spawn_linux_session(session, argc, argv);
-#else
-    (void)session;
-    (void)argc;
-    (void)argv;
-    fprintf(stderr, "Error: unsupported platform\n");
-    return -1;
-#endif
-}
-
 int main(int argc, char *argv[]) {
     if (argc < 2) {
         fprintf(stderr, "Usage: %s COMMAND [ARG]...\n", argv[0]);
@@ -29,9 +15,16 @@ int main(int argc, char *argv[]) {
         .parser = NULL,
     };
 
-    if (spawn_current_platform(&session, argc, argv) != 0) {
+#ifdef __linux__
+    if (spawn_linux_session(&session, argc, argv) != 0) {
         return EXIT_FAILURE;
     }
 
     return run_trace_session(&session);
+#else
+    (void)session;
+    (void)argv;
+    fprintf(stderr, "Error: sperf only supports Linux\n");
+    return EXIT_FAILURE;
+#endif
 }
